@@ -48,8 +48,7 @@ def get_fundamentals_info(stock):
 # 根据股票名，获取股票 code
 def get_stock_code(stock_name):
     securities = jq.get_all_securities()
-    stock_code = securities[securities['display_name'] == stock_name].index[0]
-    return stock_code
+    return securities[securities['display_name'] == stock_name].index[0]
 
 # 根据市值，获取股票池
 def market_cap(): 
@@ -57,8 +56,7 @@ def market_cap():
         jq.valuation.code).filter(
             jq.valuation.market_cap > 2000
         ))
-    wholeAList = list(wholeA['code'])
-    return wholeAList
+    return list(wholeA['code'])
 
 # 1-1 选股模块-动量因子轮动 
 # 基于股票年化收益和判定系数打分,并按照分数从大到小排名
@@ -89,13 +87,10 @@ def get_rank(stock_pool):
         stock_score = stock[1]
         security_info = jq.get_security_info(stock_code)
         stock_name = security_info.display_name
-        print('{}({}):{}'.format(stock_name, stock_code, stock_score))
+        print(f'{stock_name}({stock_code}):{stock_score}')
     print('#' * 64)
-    code_list = []
-    for i in range((len(stock_pool))):
-        code_list.append(sort_list[i][0])
-    rank_stock = code_list[0:stock_num]
-    return rank_stock
+    code_list = [sort_list[i][0] for i in range((len(stock_pool)))]
+    return code_list[:stock_num]
 
 # 2-1 择时模块-计算线性回归统计值
 # 对输入的自变量每日最低价 x(series) 和因变量每日最高价 y(series) 建立 OLS 回归模型,返回元组(截距,斜率,拟合度)
@@ -163,16 +158,16 @@ def get_test():
         current_dt = datetime.strptime(current_dt, '%Y-%m-%d')
         previous_date  = current_dt - timedelta(days = each_day - 1)
         day = each_day
-        print(each_day, previous_date)
+        print(day, previous_date)
         check_out_list = get_rank(stock_pool)
         for each_check_out in check_out_list:
             security_info = jq.get_security_info(each_check_out)
             stock_name = security_info.display_name
             stock_code = each_check_out
-            print('今日自选股:{}({})'.format(stock_name, stock_code))
+            print(f'今日自选股:{stock_name}({stock_code})')
         #获取综合择时信号
         timing_signal = get_timing_signal(ref_stock)
-        print('今日择时信号:{}'.format(timing_signal))
+        print(f'今日择时信号:{timing_signal}')
         print('*' * 100)
 
 if __name__ == "__main__":
@@ -181,8 +176,8 @@ if __name__ == "__main__":
         security_info = jq.get_security_info(each_check_out)
         stock_name = security_info.display_name
         stock_code = each_check_out
-        print('今日自选股:{}({})'.format(stock_name, stock_code))
+        print(f'今日自选股:{stock_name}({stock_code})')
     #获取综合择时信号
     timing_signal = get_timing_signal(ref_stock)
-    print('今日择时信号:{}'.format(timing_signal))
+    print(f'今日择时信号:{timing_signal}')
     print('*' * 100)
